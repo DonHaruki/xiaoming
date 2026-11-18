@@ -22,8 +22,8 @@
   --night-signal: #F29B36;
   --night-second: #E15C75;
 
-  --display: "FZXiaoBiaoSong-B05S", "方正小标宋简体", "STSong", SimSun, serif;
-  --body: "STSong", "Songti SC", SimSun, serif;
+  --display: "FZXiaoBiaoSong-B05S", "方正小标宋简体", "STSong", "Source Han Serif SC", "Noto Serif CJK SC", SimSun, serif;
+  --body: "STSong", "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC", SimSun, serif;
   --label: "Helvetica Neue LT Pro", "Helvetica Neue", Arial, sans-serif;
   --mono: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
 
@@ -327,6 +327,21 @@ input[type="search"]:focus-visible { outline: 2px solid var(--sig); outline-offs
   margin: 0;
 }
 .sheet-tools { display: flex; justify-content: flex-start; align-items: baseline; gap: 24px; flex-wrap: wrap; margin-bottom: 12px; }
+.filter-row { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 0 0 14px; }
+.filter-btn {
+  font-family: var(--label);
+  font-size: .75rem;
+  letter-spacing: .06em;
+  color: var(--fg-soft);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  padding: 2px 0 4px;
+  cursor: pointer;
+}
+.filter-btn:hover { color: var(--fg); }
+.filter-btn[aria-pressed="true"] { color: var(--fg); border-bottom-color: var(--fg-soft); }
 
 /* 不等宽两列，行高由内容决定，不齐 */
 .contact-sheet {
@@ -435,8 +450,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 }
 .reader-article .r-meta { display: flex; flex-wrap: wrap; gap: 0 24px; }
 .reader-article .r-body { max-width: 40em; }
-.r-body p { margin: 0 0 1.1em; }
-.r-body p.vline { margin: 0; }
+/* 书式正文：首行缩进两字，段间只留一线气口，不再靠空行分段 */
+.r-body p { margin: 0 0 .5em; text-indent: 2em; }
+.r-body p.vline { margin: 0; text-indent: 0; }
 .r-body h3 { font-family: var(--display); font-weight: 500; font-size: 1.375rem; line-height: 1.4; margin: 2em 0 .7em; }
 .r-body h2 { font-size: 1.375rem; letter-spacing: .02em; margin: 2em 0 .7em; }
 .r-body blockquote {
@@ -445,7 +461,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   border-left: 1px solid var(--line);
   color: var(--fg-soft);
 }
-.r-body blockquote p { margin: 0; }
+.r-body blockquote p { margin: 0; text-indent: 0; }
 .r-body ul { margin: 0 0 1.1em; padding-left: 1.4em; }
 .r-body li { margin-bottom: .3em; }
 .r-body strong { font-weight: 700; }

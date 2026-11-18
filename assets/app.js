@@ -12,10 +12,11 @@
   var state = {
     band: "day",
     query: "",
-    expand: { day: false, dusk: false, books: false },
+    expand: { day: false, dusk: false, night: false, books: false },
     lastTrigger: null,
     echoId: null,
     readerId: null,
+    category: "",
     content: null,
     search: null,
     contentPromise: null,
@@ -29,6 +30,18 @@
   }
 
   var INDEX = new Map();
+
+  // 摘句在卡片上截断时收在句读处，并补省略号，避免「我喜欢沿着不」这种断口。
+  function clip(s, n) {
+    s = String(s == null ? "" : s).replace(/\s+/g, " ").trim();
+    if (s.length <= n) return s;
+    var cut = s.slice(0, n);
+    var last = Math.max(cut.lastIndexOf("。"), cut.lastIndexOf("，"), cut.lastIndexOf("；"),
+      cut.lastIndexOf("！"), cut.lastIndexOf("？"));
+    if (last >= Math.floor(n * 0.55)) cut = cut.slice(0, last + 1);
+    return cut + "…";
+  }
+
   D.essays.forEach(function (e) { INDEX.set(e.id, e); });
 
   var bookItems = D.books.map(function (name, i) {
@@ -52,7 +65,7 @@
       if (e.kind === "book") {
         return '<button type="button" class="cs-item" data-id="' + esc(e.id) + '"' + extra + ">" + head + "</button>";
       }
-      var line = (e.excerpt || "").slice(0, 28);
+      var line = clip(e.excerpt, 44);
       var meta = opts.showBand ? TAGS[e.band] || "" : "";
       return '<button type="button" class="cs-item" data-id="' + esc(e.id) + '">' + head +
         '<span class="cs-excerpt">' + esc(line) + "</span>" +
@@ -62,7 +75,8 @@
   }
 
   function matches(e, q) {
-    var hay = e.title + " " + e.category + " " + (e.excerpt || "");
+    // 标题、分类、日期、摘录都进索引；全文到位后再叠加正文。
+    var hay = e.title + " " + e.category + " " + (e.date || "") + " " + (e.excerpt || "");
     if (state.search && state.search[e.id]) hay += " " + state.search[e.id];
     return hay.toLowerCase().indexOf(q) !== -1;
   }
@@ -71,7 +85,7 @@
     var q = state.query.trim().toLowerCase();
     var searching = !!q;
     var shown = (searching || expanded) ? items : items.slice(0, DEFAULT_LIMIT);
-    $(sheetId).innerHTML = sheetHTML(shown, { showBand: searching && sheetId === "sheet-day" });
+    $(sheetId).innerHTML = sheetHTML(shown, { showBand: searching });
     if (statusId) {
       $(statusId).textContent = searching
         ? "命中 " + items.length + (state.search ? "" : " · 检索中")
@@ -82,16 +96,45 @@
     }
   }
 
+  function renderFilters() {
+    var cats = [];
+    D.essays.forEach(function (e) {
+      if (e.band === "day" && cats.indexOf(e.category) < 0) cats.push(e.category);
+    });
+    var labels = ["全部"].concat(cats);
+    $("day-filters").innerHTML = labels.map(function (c) {
+      var val = c === "全部" ? "" : c;
+      var count = c === "全部"
+        ? byBand.day.length
+        : byBand.day.filter(function (e) { return e.category === c; }).length;
+      var active = state.category === val;
+      return '<button type="button" class="filter-btn" data-cat="' + esc(val) + '"' +
+        ' aria-pressed="' + (active ? "true" : "false") + '">' +
+        esc(c) + " " + count + "</button>";
+    }).join("");
+  }
+
   function renderSheets() {
     var q = state.query.trim().toLowerCase();
-    var dayItems = q ? D.essays.filter(function (e) { return matches(e, q); }) : byBand.day;
+    var searching = !!q;
+    var dayItems = searching
+      ? D.essays.filter(function (e) { return e.band === "day" && matches(e, q); })
+      : byBand.day.filter(function (e) { return !state.category || e.category === state.category; });
+    var duskItems = searching
+      ? D.essays.filter(function (e) { return e.band === "dusk" && matches(e, q); })
+      : byBand.dusk;
+    var nightItems = searching
+      ? D.essays.filter(function (e) { return e.band === "night" && matches(e, q); })
+      : byBand.night;
+
     paint("sheet-day", dayItems, state.expand.day, "search-status", "day-expand");
-    paint("sheet-dusk", byBand.dusk, state.expand.dusk, "dusk-status", "dusk-expand");
+    paint("sheet-dusk", duskItems, state.expand.dusk, "dusk-status", "dusk-expand");
+    paint("sheet-night", nightItems, state.expand.night, "night-status", "night-expand");
+
     var bookShown = state.expand.books ? bookItems : bookItems.slice(0, DEFAULT_LIMIT);
     $("sheet-books").innerHTML = sheetHTML(bookShown);
     $("book-status").textContent = "";
     $("book-expand").textContent = state.expand.books ? "收起" : "全部";
-    $("sheet-night").innerHTML = sheetHTML(byBand.night);
   }
 
   function renderVerse() {
@@ -244,6 +287,19 @@
     if (next) openReader(next, null);
   });
 
+  $("day-filters").addEventListener("click", function (ev) {
+    var btn = ev.target.closest(".filter-btn[data-cat]");
+    if (!btn) return;
+    state.category = btn.dataset.cat;
+    if (state.query.trim()) {
+      $("q").value = "";
+      state.query = "";
+    }
+    state.expand.day = false;
+    renderFilters();
+    renderSheets();
+  });
+
   $("q").addEventListener("focus", ensureSearch);
   $("q").addEventListener("input", function () {
     state.query = $("q").value;
@@ -251,21 +307,24 @@
     if (state.query.trim()) ensureSearch();
   });
 
-  $("day-expand").addEventListener("click", function () {
+  function toggleSection(band, btnId) {
     if (state.query.trim()) {
+      // 搜索态下这枚按钮是「清除」：清空查询、三区一起复原。
       $("q").value = "";
       state.query = "";
+      state.category = "";
+      state.expand.day = state.expand.dusk = state.expand.night = false;
+      renderFilters();
       renderSheets();
       $("q").focus();
     } else {
-      state.expand.day = !state.expand.day;
+      state.expand[band] = !state.expand[band];
       renderSheets();
     }
-  });
-  $("dusk-expand").addEventListener("click", function () {
-    state.expand.dusk = !state.expand.dusk;
-    renderSheets();
-  });
+  }
+  $("day-expand").addEventListener("click", function () { toggleSection("day", "day-expand"); });
+  $("dusk-expand").addEventListener("click", function () { toggleSection("dusk", "dusk-expand"); });
+  $("night-expand").addEventListener("click", function () { toggleSection("night", "night-expand"); });
   $("book-expand").addEventListener("click", function () {
     state.expand.books = !state.expand.books;
     renderSheets();
@@ -280,7 +339,16 @@
   window.addEventListener("scroll", function () {
     if (ticking) return;
     ticking = true;
-    window.requestAnimationFrame(function () { syncBand(); ticking = false; });
+    var fired = false;
+    var run = function () {
+      if (fired) return;
+      fired = true;
+      syncBand();
+      ticking = false;
+    };
+    window.requestAnimationFrame(run);
+    // 兜底：标签页不可见时 rAF 会被暂停，靠定时器保证换肤与导航态跟上。
+    window.setTimeout(run, 150);
   }, { passive: true });
 
   if ("IntersectionObserver" in window) {
@@ -292,6 +360,7 @@
     document.querySelectorAll(".expose").forEach(function (el) { io.observe(el); });
   }
 
+  renderFilters();
   renderVerse();
   renderQuotes();
   renderSheets();

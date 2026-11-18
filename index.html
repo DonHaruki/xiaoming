@@ -40,13 +40,14 @@
         <div class="field-row">
           <div class="field">
             <label class="label-cn" for="q">检索</label>
-            <input id="q" type="search" placeholder="时间 / 萧红 / 单车" autocomplete="off">
+            <input id="q" type="search" placeholder="书名 / 2024-04 / 单车" autocomplete="off">
           </div>
         </div>
         <div class="sheet-tools">
           <span class="micro" id="search-status"></span>
           <button class="btn btn-quiet" id="day-expand" type="button">全部</button>
         </div>
+        <div class="filter-row" id="day-filters" aria-label="按类别筛选"></div>
         <div class="contact-sheet" id="sheet-day" aria-label="写作"></div>
 
         <div class="quote-tail">
@@ -97,6 +98,10 @@
         <div class="verse-set" id="verse-set" aria-label="诗"></div>
 
         <div class="sec-head"><h3>诗歌与小品</h3></div>
+        <div class="sheet-tools">
+          <span class="micro" id="night-status"></span>
+          <button class="btn btn-quiet" id="night-expand" type="button">全部</button>
+        </div>
         <div class="contact-sheet" id="sheet-night" aria-label="诗歌"></div>
 
         <div class="quote-tail">
