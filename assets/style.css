@@ -261,6 +261,8 @@ nav a[aria-current] { color: var(--fg); }
   cursor: pointer;
   background: transparent;
   color: var(--fg);
+  text-decoration: none;
+  display: inline-block;
   transition: border-color .18s cubic-bezier(.16, 1, .3, 1),
               background-color .18s cubic-bezier(.16, 1, .3, 1);
 }
