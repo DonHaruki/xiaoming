@@ -14,7 +14,12 @@
     query: "",
     expand: { day: false, dusk: false, books: false },
     lastTrigger: null,
-    echoId: null
+    echoId: null,
+    readerId: null,
+    content: null,
+    search: null,
+    contentPromise: null,
+    searchPromise: null
   };
 
   function esc(s) {
@@ -57,7 +62,9 @@
   }
 
   function matches(e, q) {
-    return (e.title + " " + e.category + " " + (e.plain || "")).toLowerCase().indexOf(q) !== -1;
+    var hay = e.title + " " + e.category + " " + (e.excerpt || "");
+    if (state.search && state.search[e.id]) hay += " " + state.search[e.id];
+    return hay.toLowerCase().indexOf(q) !== -1;
   }
 
   function paint(sheetId, items, expanded, statusId, expandId) {
@@ -65,7 +72,11 @@
     var searching = !!q;
     var shown = (searching || expanded) ? items : items.slice(0, DEFAULT_LIMIT);
     $(sheetId).innerHTML = sheetHTML(shown, { showBand: searching && sheetId === "sheet-day" });
-    if (statusId) $(statusId).textContent = searching ? "命中 " + items.length : "";
+    if (statusId) {
+      $(statusId).textContent = searching
+        ? "命中 " + items.length + (state.search ? "" : " · 检索中")
+        : "";
+    }
     if (expandId) {
       $(expandId).textContent = searching ? "清除" : (expanded ? "收起" : "全部");
     }
@@ -92,7 +103,7 @@
       return '<div class="verse-card">' +
         "<h4>" + esc(e.title) + "</h4>" +
         '<span class="micro">' + esc(e.date) + "</span>" +
-        '<div style="margin-top:18px">' + e.body + "</div>" +
+        '<div style="margin-top:18px">' + (e.body || "") + "</div>" +
         "</div>";
     }).join("");
   }
@@ -109,15 +120,65 @@
     });
   }
 
+  function fillBody(id, html) {
+    if (state.readerId !== id) return;
+    $("reader-body").innerHTML = html;
+  }
+
+  function ensureContent() {
+    if (state.contentPromise) return state.contentPromise;
+    state.contentPromise = fetch("assets/content.json")
+      .then(function (r) { if (!r.ok) throw new Error("content"); return r.json(); })
+      .then(function (j) {
+        state.content = j;
+        if (state.readerId) fillBody(state.readerId, state.content[state.readerId] || "");
+        return j;
+      })
+      .catch(function () {
+        state.contentPromise = null;
+        if (state.readerId) fillBody(state.readerId, "正文暂未载入。");
+      });
+    return state.contentPromise;
+  }
+
+  function ensureSearch() {
+    if (state.searchPromise) return state.searchPromise;
+    state.searchPromise = fetch("assets/search.json")
+      .then(function (r) { if (!r.ok) throw new Error("search"); return r.json(); })
+      .then(function (j) {
+        state.search = j;
+        if (state.query.trim()) renderSheets();
+        return j;
+      })
+      .catch(function () {
+        state.searchPromise = null;
+        /* 检索退回标题与摘录，功能不中断 */
+      });
+    return state.searchPromise;
+  }
+
   function openReader(item, trigger) {
     if (trigger) state.lastTrigger = trigger;
+    state.readerId = item.id;
     var band = item.band || state.band;
     $("reader").dataset.album = band;
     $("reader-album").textContent = ALBUMS[band] || ALBUMS.day;
     $("reader-title").textContent = item.title;
     $("reader-meta").innerHTML = [item.date, item.category, item.words ? item.words + " 字" : ""]
       .filter(Boolean).map(function (t) { return '<span class="micro">' + esc(t) + "</span>"; }).join("");
-    $("reader-body").innerHTML = item.body || "";
+
+    var body = null;
+    if (item.body != null) body = item.body;
+    else if (state.content) body = state.content[item.id];
+    if (body != null) {
+      $("reader-body").innerHTML = body;
+    } else {
+      $("reader-body").innerHTML = '<p class="micro">取正文中…</p>';
+      ensureContent().then(function () {
+        fillBody(item.id, state.content ? (state.content[item.id] || "") : "正文暂未载入。");
+      });
+    }
+
     var ec = item.echo;
     state.echoId = ec ? ec.id : null;
     $("reader-echo").innerHTML = ec
@@ -132,6 +193,7 @@
   }
 
   function closeReader() {
+    state.readerId = null;
     $("reader").hidden = true;
     document.body.style.overflow = "";
     if (state.lastTrigger && state.lastTrigger.focus) state.lastTrigger.focus();
@@ -171,6 +233,7 @@
     $("q").value = btn.dataset.term;
     state.query = btn.dataset.term;
     renderSheets();
+    ensureSearch();
     $("day").scrollIntoView({ behavior: "smooth", block: "start" });
     $("q").focus({ preventScroll: true });
   });
@@ -181,9 +244,11 @@
     if (next) openReader(next, null);
   });
 
+  $("q").addEventListener("focus", ensureSearch);
   $("q").addEventListener("input", function () {
     state.query = $("q").value;
     renderSheets();
+    if (state.query.trim()) ensureSearch();
   });
 
   $("day-expand").addEventListener("click", function () {
@@ -231,4 +296,14 @@
   renderQuotes();
   renderSheets();
   syncBand();
+
+  function prefetch() {
+    ensureContent();
+    ensureSearch();
+  }
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(prefetch, { timeout: 2500 });
+  } else {
+    window.setTimeout(prefetch, 300);
+  }
 })();
