@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="读书、写作与骑行。">
+<title>启蒙</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-album="day">
+
+<header id="site-header" data-album="day">
+  <div class="wrap">
+    <a class="wordmark" href="#top">启蒙</a>
+    <nav aria-label="段落导航">
+      <a href="#day" data-nav="day" aria-current="page">Day</a>
+      <a href="#dusk" data-nav="dusk">Dusk</a>
+      <a href="#night" data-nav="night">Night</a>
+    </nav>
+    <span class="micro" id="header-meta">OCEAN SIDE</span>
+  </div>
+</header>
+
+<main>
+
+  <section class="band" id="top" data-band="day" data-album="day">
+    <div class="wrap hero expose">
+      <h1>启蒙<span class="mark-day" aria-hidden="true"></span></h1>
+      <p class="tagline">读书 · 写作 · 骑行</p>
+      <blockquote class="epigraph">
+        <p>目光所及即存在，道听途说非真理。</p>
+        <cite class="micro">《单车志vol1—中心地带》· 2023-05-04</cite>
+      </blockquote>
+    </div>
+
+    <div class="wrap band-grid" id="day">
+      <div class="main-col">
+        <div class="band-head"><h2 class="ttl ttl-day">昼 · 写作</h2></div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="label-cn" for="q">检索</label>
+            <input id="q" type="search" placeholder="时间 / 萧红 / 单车" autocomplete="off">
+          </div>
+        </div>
+        <div class="sheet-tools">
+          <span class="micro" id="search-status"></span>
+          <button class="btn btn-quiet" id="day-expand" type="button">全部</button>
+        </div>
+        <div class="contact-sheet" id="sheet-day" aria-label="写作"></div>
+
+        <div class="quote-tail">
+          <p class="quote">我觉得自己就是对联上的一个字，虚飘飘的，不落实地。</p>
+          <cite class="micro">《整理国故》· 2026-10-02</cite>
+        </div>
+      </div>
+      <aside class="margin-note" id="quotes-day" aria-label="摘句"></aside>
+    </div>
+  </section>
+
+  <section class="band" id="dusk" data-band="dusk" data-album="dusk">
+    <div class="wrap band-grid">
+      <div class="main-col">
+        <div class="band-head">
+          <div class="ttl-row"><h2 class="ttl ttl-dusk">黄昏 · 阅读</h2><span class="ring" aria-hidden="true"></span></div>
+        </div>
+
+        <div class="sec-head"><h3>文艺评论</h3></div>
+        <div class="sheet-tools">
+          <span class="micro" id="dusk-status"></span>
+          <button class="btn btn-quiet" id="dusk-expand" type="button">全部</button>
+        </div>
+        <div class="contact-sheet" id="sheet-dusk" aria-label="文艺评论"></div>
+
+        <div class="sec-head"><h3>读过</h3></div>
+        <div class="sheet-tools">
+          <span class="micro" id="book-status"></span>
+          <button class="btn btn-quiet" id="book-expand" type="button">全部</button>
+        </div>
+        <div class="contact-sheet" id="sheet-books" aria-label="书目"></div>
+
+        <div class="quote-tail">
+          <p class="quote">喜欢听一首歌，不如说是喜欢听人说话。</p>
+          <cite class="micro">《再论日本音乐》· 2024-06-21</cite>
+        </div>
+      </div>
+      <aside class="margin-note" id="quotes-dusk" aria-label="摘句"></aside>
+    </div>
+  </section>
+
+  <section class="band" id="night" data-band="night" data-album="night">
+    <div class="wrap band-grid">
+      <div class="main-col">
+        <div class="band-head"><h2 class="ttl ttl-night">夜 · 诗</h2></div>
+
+        <div class="sec-head"><h3>三首</h3></div>
+        <div class="verse-set" id="verse-set" aria-label="诗"></div>
+
+        <div class="sec-head"><h3>诗歌与小品</h3></div>
+        <div class="contact-sheet" id="sheet-night" aria-label="诗歌"></div>
+
+        <div class="quote-tail">
+          <p class="quote">但我认出来了。</p>
+          <cite class="micro">《蔷薇刺上的宿泪》· 2026-05-23</cite>
+        </div>
+      </div>
+      <aside class="margin-note" id="quotes-night" aria-label="摘句"></aside>
+    </div>
+  </section>
+
+</main>
+
+<footer data-album="night">
+  <div class="wrap">
+    <span class="micro">启蒙</span>
+    <span class="micro">OCEAN SIDE / ADVENTURE / TROPIC OF CAPRICORN</span>
+  </div>
+</footer>
+
+<div class="reader" id="reader" data-album="day" hidden role="dialog" aria-modal="true" aria-labelledby="reader-title">
+  <div class="reader-bar">
+    <div class="wrap">
+      <span class="micro" id="reader-album">OCEAN SIDE</span>
+      <button class="btn btn-quiet btn-label" id="reader-close" type="button">Close</button>
+    </div>
+  </div>
+  <article class="reader-article wrap">
+    <div class="r-head">
+      <h2 id="reader-title"></h2>
+      <div class="r-meta" id="reader-meta"></div>
+    </div>
+    <div class="r-body" id="reader-body"></div>
+    <div class="echo" id="reader-echo"></div>
+  </article>
+</div>
+
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
