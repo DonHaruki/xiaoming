@@ -22,8 +22,8 @@
   --night-signal: #F29B36;
   --night-second: #E15C75;
 
-  --display: "FZXiaoBiaoSong-B05S", "方正小标宋简体", "STSong", "Source Han Serif SC", "Noto Serif CJK SC", SimSun, serif;
-  --body: "STSong", "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC", SimSun, serif;
+  --display: "FZXiaoBiaoSong-B05S", "方正小标宋简体", "Songti SC", "STSong", "Source Han Serif SC", "Noto Serif CJK SC", "Noto Serif SC", "思源宋体", "FangSong", SimSun, serif;
+  --body: "STSong", "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC", "Noto Serif SC", "思源宋体", SimSun, serif;
   --label: "Helvetica Neue LT Pro", "Helvetica Neue", Arial, sans-serif;
   --mono: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
 
@@ -31,6 +31,7 @@
   --fg: var(--day-ink);
   --fg-soft: var(--day-muted);
   --line: var(--day-mist);
+  --hover-bg: rgba(5, 48, 95, .055);
   --sig: var(--day-signal);
   --btn-bg: var(--day-ink);
   --btn-fg: var(--day-paper);
@@ -43,6 +44,7 @@
   --fg: var(--dusk-foam);
   --fg-soft: var(--dusk-lilac);
   --line: rgba(229, 229, 235, .20);
+  --hover-bg: rgba(229, 229, 235, .08);
   --sig: var(--dusk-signal);
   --btn-bg: var(--dusk-deep);
   --btn-fg: var(--dusk-foam);
@@ -55,6 +57,7 @@
   --fg: var(--night-cloud);
   --fg-soft: var(--night-muted);
   --line: rgba(224, 218, 205, .16);
+  --hover-bg: rgba(224, 218, 205, .07);
   --sig: var(--night-signal);
   --btn-bg: var(--night-signal);
   --btn-fg: var(--night-cabin);
@@ -135,12 +138,22 @@ header .wrap {
   padding-block: 16px;
 }
 .wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
   font-family: var(--display);
   font-size: 1.0625rem;
   letter-spacing: .10em;
   margin: 0;
   white-space: nowrap;
   text-decoration: none;
+}
+.wordmark .wm-en {
+  font-family: var(--mono);
+  font-size: .6875rem;
+  font-weight: 400;
+  letter-spacing: .16em;
+  color: var(--fg-soft);
 }
 nav { display: flex; gap: 22px; }
 nav a {
@@ -187,13 +200,43 @@ nav a[aria-current] { color: var(--fg); }
 }
 .q-item:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
 .q-line {
+  display: block;
   margin: 0 0 12px;
   font-family: var(--body);
   font-size: 1rem;
   line-height: 1.8;
   color: var(--fg-soft);
+  transition: color .18s cubic-bezier(.16, 1, .3, 1);
 }
-.q-src { display: block; font-style: normal; white-space: nowrap; }
+.q-src {
+  display: block;
+  font-style: normal;
+  overflow-wrap: anywhere;
+  transition: color .18s cubic-bezier(.16, 1, .3, 1);
+}
+
+.quote-trigger {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.quote-trigger:hover .q-line,
+.quote-trigger:hover .q-src,
+.quote-trigger:hover .epigraph-cite,
+.quote-trigger:hover .quote-cite {
+  color: var(--fg);
+}
+.quote-trigger:hover .q-src,
+.quote-trigger:hover .epigraph-cite,
+.quote-trigger:hover .quote-cite {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
 
 .band-head { margin-bottom: 56px; }
 
@@ -205,6 +248,21 @@ nav a[aria-current] { color: var(--fg); }
   line-height: 1.06;
   letter-spacing: .04em;
   margin: 0 0 24px;
+}
+.hero h1.site-title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  letter-spacing: .06em;
+  margin: 0 0 22px;
+}
+.site-title .title-en {
+  font-family: var(--mono);
+  font-size: .8125rem;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: .22em;
+  color: var(--fg-soft);
 }
 .tagline {
   font-family: var(--display);
@@ -219,8 +277,15 @@ nav a[aria-current] { color: var(--fg); }
   border-left: 1px solid var(--line);
   max-width: 30em;
 }
-.epigraph p { margin: 0; }
-.epigraph cite { display: block; margin-top: 10px; font-style: normal; }
+.epigraph p,
+.epigraph-line { display: block; margin: 0; }
+.epigraph cite,
+.epigraph-cite {
+  display: block;
+  margin-top: 10px;
+  font-style: normal;
+  transition: color .18s cubic-bezier(.16, 1, .3, 1);
+}
 
 .ttl { font-family: var(--display); font-weight: 500; margin: 0; }
 .ttl-day {
@@ -266,6 +331,7 @@ nav a[aria-current] { color: var(--fg); }
   transition: border-color .18s cubic-bezier(.16, 1, .3, 1),
               background-color .18s cubic-bezier(.16, 1, .3, 1);
 }
+.btn[hidden] { display: none; }
 .btn-primary { background: var(--btn-bg); color: var(--btn-fg); border-color: var(--btn-bg); }
 [data-album="dusk"] .btn-primary { border-color: var(--fg-soft); }
 .btn-primary:hover { border-color: var(--fg); }
@@ -295,8 +361,13 @@ nav a[aria-current] { color: var(--fg); }
   vertical-align: 4px;
   margin-left: 12px;
 }
+.site-title .mark-day {
+  flex: none;
+  margin: 0 14px 0 12px;
+  transform: translateY(-4px);
+}
 
-.field-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.field-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 14px; }
 .field { flex: 1 1 320px; }
 input[type="search"] {
   width: 100%;
@@ -329,6 +400,7 @@ input[type="search"]:focus-visible { outline: 2px solid var(--sig); outline-offs
   margin: 0;
 }
 .sheet-tools { display: flex; justify-content: flex-start; align-items: baseline; gap: 24px; flex-wrap: wrap; margin-bottom: 12px; }
+.sheet-tools .micro:empty { display: none; }
 .filter-row { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 0 0 14px; }
 .filter-btn {
   font-family: var(--label);
@@ -365,7 +437,9 @@ input[type="search"]:focus-visible { outline: 2px solid var(--sig); outline-offs
   cursor: pointer;
 }
 .cs-item:nth-child(2n) { border-right: 0; padding-left: 24px; }
-.cs-item:hover { background: var(--line); }
+.cs-item:hover { background: var(--hover-bg); }
+.cs-item.cs-static { cursor: default; }
+.cs-item.cs-static:hover { background: transparent; }
 .cs-item .cs-no { display: block; margin-bottom: 8px; }
 .cs-item .cs-title {
   display: block;
@@ -390,6 +464,18 @@ input[type="search"]:focus-visible { outline: 2px solid var(--sig); outline-offs
   padding: 24px 0;
   border-bottom: 1px solid var(--line);
 }
+.status-jump {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.status-jump:hover { opacity: .75; }
 
 .verse-set { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); }
 .verse-card { padding: 28px 24px 32px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); }
@@ -406,6 +492,7 @@ input[type="search"]:focus-visible { outline: 2px solid var(--sig); outline-offs
   max-width: 34em;
 }
 .quote-tail .quote {
+  display: block;
   font-family: var(--display);
   font-weight: 500;
   font-size: 1.375rem;
@@ -413,7 +500,12 @@ input[type="search"]:focus-visible { outline: 2px solid var(--sig); outline-offs
   letter-spacing: .02em;
   margin: 0 0 12px;
 }
-.quote-tail cite { font-style: normal; }
+.quote-tail cite,
+.quote-tail .quote-cite {
+  display: block;
+  font-style: normal;
+  transition: color .18s cubic-bezier(.16, 1, .3, 1);
+}
 
 footer { border-top: 1px solid var(--line); background: var(--bg); color: var(--fg); }
 footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-block: 24px; }
@@ -439,6 +531,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   align-items: center;
   gap: 16px;
   padding-block: 12px;
+}
+.reader-bar-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 .reader-article { padding-block: 64px 128px; }
 .reader-article .r-head { border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 40px; }
@@ -508,9 +605,12 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   .band { padding-block: 64px 72px; }
   .hero { padding-block: 64px 56px; }
   .hero h1 { font-size: 2rem; }
+  .hero h1.site-title { font-size: 2.25rem; }
+  .site-title .title-en { font-size: .75rem; letter-spacing: .18em; }
   .ttl-day { font-size: 2rem; max-width: none; }
   .ttl-dusk { font-size: 2rem; }
   .ttl-night { font-size: 2rem; }
+  .reader-bar .btn { padding: 8px 14px; }
   .reader-article h2 { font-size: 1.75rem; }
   .verse-set { grid-template-columns: 1fr; }
   .verse-card,
