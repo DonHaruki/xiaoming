@@ -39,6 +39,14 @@
       </blockquote>
     </div>
 
+    <div class="wrap spotlight-wrap" aria-labelledby="spotlight-heading">
+      <div class="spotlight-head">
+        <h2 id="spotlight-heading">先读这几篇</h2>
+        <span class="micro">六篇选目 · 横跨昼、黄昏与夜</span>
+      </div>
+      <div class="spotlight-list" id="spotlight"></div>
+    </div>
+
     <div class="wrap band-grid" id="day">
       <div class="main-col">
         <div class="band-head"><h2 class="ttl ttl-day">昼 · 写作</h2></div>
@@ -54,6 +62,8 @@
           <button class="btn btn-quiet" id="day-expand" type="button">全部</button>
         </div>
         <div class="filter-row" id="day-filters" aria-label="按类别筛选"></div>
+        <div class="thread-row" id="day-threads" aria-label="按专题脉络阅读"></div>
+        <p class="view-caption" id="day-caption"></p>
         <div class="contact-sheet" id="sheet-day" aria-label="写作"></div>
 
         <div class="quote-tail">
@@ -79,6 +89,8 @@
           <span class="micro" id="dusk-status"></span>
           <button class="btn btn-quiet" id="dusk-expand" type="button">全部</button>
         </div>
+        <div class="filter-row" id="dusk-filters" aria-label="按评论主题筛选"></div>
+        <p class="view-caption" id="dusk-caption"></p>
         <div class="contact-sheet" id="sheet-dusk" aria-label="文艺评论"></div>
 
         <div class="sec-head"><h3>读过</h3></div>
@@ -153,6 +165,7 @@
       <div class="r-meta" id="reader-meta"></div>
     </div>
     <div class="r-body" id="reader-body"></div>
+    <div class="series-nav" id="reader-series" hidden></div>
     <div class="echo" id="reader-echo"></div>
   </article>
 </div>
